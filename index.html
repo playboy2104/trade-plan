@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GILBERT — Pro Trader | SMC Trade Plan & Execution System</title>
+<style>
+:root{--bg:#0b0e14;--surface:#131822;--surface2:#1a2130;--border:#243044;--text:#e6edf3;--muted:#8b98ab;--bull:#26a69a;--bear:#ef5350;--accent:#4d9fff;--gold:#f0b429}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.65}
+.container{max-width:1000px;margin:0 auto;padding:0 1.25rem}
+a{color:var(--accent)}
+nav{border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
+.nav-inner{display:flex;align-items:center;gap:1.2rem;padding:.9rem 1.25rem;max-width:1000px;margin:0 auto;flex-wrap:wrap}
+.logo{font-weight:700;font-size:1.1rem;color:var(--text)}.logo span{color:var(--gold)}
+nav a{color:var(--muted);font-size:.9rem;cursor:pointer}
+nav a.active{color:var(--text);border-bottom:2px solid var(--bull);padding-bottom:2px}
+main{padding:1.8rem 0 4rem;min-height:85vh}
+h1{font-size:1.8rem;margin-bottom:.25rem}
+h2{font-size:1.25rem;margin:1.6rem 0 .7rem}
+.sub{color:var(--muted);margin-bottom:1.2rem}
+.hero-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem 1.4rem;margin-bottom:1.5rem}
+.status{font-weight:700;font-size:1.05rem}
+.status.go{color:var(--bull)}.status.nogo{color:var(--bear)}.status.partial{color:var(--gold)}
+.btn{display:inline-block;background:var(--bull);color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-weight:600;border:none;cursor:pointer;font-size:.9rem}
+.btn.red{background:var(--bear)}.btn.blue{background:var(--accent)}.btn.gray{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn:hover{filter:brightness(1.12)}
+.btn.sm{padding:.35rem .8rem;font-size:.8rem}
+.sect{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.3rem 1.5rem;margin-bottom:1.3rem}
+.sect-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.sect-head h2{border:none;margin:0;font-size:1.15rem}
+.sect-meta{font-size:.8rem;color:var(--muted)}
+.sect.complete{border-color:var(--bull)}
+.sect.incomplete{border-color:var(--bear)}
+.cl{list-style:none;margin-top:1rem}
+.cl li{display:flex;align-items:flex-start;gap:.7rem;padding:.5rem .6rem;border-radius:6px;cursor:pointer;margin:.15rem 0}
+.cl li:hover{background:var(--surface2)}
+.cl li .box{flex-shrink:0;width:1.15rem;height:1.15rem;border:2px solid var(--muted);border-radius:4px;margin-top:.2rem;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:transparent}
+.cl li.checked .box{border-color:var(--bull);background:var(--bull);color:#000}
+.cl li.checked .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+.cl li .txt{font-size:.93rem;color:#c9d3e0}
+.cl li .why{display:block;font-size:.78rem;color:var(--muted);margin-top:.1rem}
+.field{margin:.8rem 0}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.55rem .8rem;border-radius:8px;font-size:.92rem;font-family:inherit}
+.field textarea{min-height:70px;resize:vertical}
+.frow{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.8rem}
+.warn{border-left:3px solid var(--gold);background:var(--surface2);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.88rem;color:var(--muted)}
+.warn b{color:var(--gold)}
+.ok{border-left:3px solid var(--bull);background:var(--surface2);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0;font-size:.9rem}
+.rule{background:var(--surface2);border:1px dashed var(--border);border-radius:8px;padding:.7rem 1rem;margin:.6rem 0;font-size:.85rem;color:var(--muted)}
+.rule b{color:var(--gold)}
+table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem}
+th,td{border:1px solid var(--border);padding:.5rem .7rem;text-align:left;color:#c9d3e0}
+th{background:var(--surface2);color:var(--text)}
+.danger-box{border:2px solid var(--bear);border-radius:12px;padding:1.2rem 1.5rem;margin:1.3rem 0;background:rgba(239,83,80,.05)}
+.danger-box h2{color:var(--bear);border:none;margin-top:0}
+footer{border-top:1px solid var(--border);padding:1.4rem 0;color:var(--muted);font-size:.8rem;text-align:center}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bull);color:#000;padding:.8rem 1.4rem;border-radius:8px;font-weight:700;display:none;z-index:99}
+@media(max-width:640px){.frow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner">
+<a class="logo">GILBERT<span> · Pro Trader</span></a>
+<a data-nav="dashboard" class="active">Dashboard</a>
+<a data-nav="premarket">Pre-Market</a>
+<a data-nav="setup">Setup Analysis</a>
+<a data-nav="execution">Execution</a>
+<a data-nav="review">Post-Trade</a>
+<a data-nav="rules">My Rules</a>
+</div></nav>
+
+<main class="container" id="app"></main>
+<footer>GILBERT's SMC Trade Plan & Execution System — Educational tool. Not financial advice. Trading involves substantial risk.</footer>
+<div id="toast"></div>
+
+<script>
+/* ================== STATE ================== */
+const DEFAULT_RULES = {
+  maxRiskPct: 1, dailyLossPct: 2, minRR: 2, maxTradesPerDay: 2,
+  pairs: "EURUSD, GBPUSD", killzones: "London 02:00-05:00 EST, NY 07:00-10:00 EST",
+  personal: [
+    "I trade ONLY inside my kill zones — no exceptions.",
+    "I risk a maximum of 1% per trade. Position size is calculated BEFORE entry.",
+    "I never move my stop loss further away after entry.",
+    "Two losses or -2% day = platform closed. Done.",
+    "No trade without a completed sweep → displacement → CHoCH sequence.",
+    "I buy in discount, sell in premium. Never chase.",
+    "Every loss gets tagged: model-fail or execution-fail.",
+    "My written bias must match the trade direction — no freelancing."
+  ]
+};
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem("gtp_"+k)) } catch(e){ return null } },
+  set: (k,v) => localStorage.setItem("gtp_"+k, JSON.stringify(v))
+};
+if (!S.get("rules")) S.set("rules", DEFAULT_RULES);
+if (!S.get("day")) S.set("day", { date: new Date().toISOString().slice(0,10), trades: 0, losses: 0, pnlPct: 0 });
+let state = S.get("state") || {};
+function save(){ S.set("state", state); }
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",2200); }
+
+/* ================== CHECKLIST DEFINITIONS ================== */
+const SECTIONS = [
+{ id:"premarket", nav:"premarket", title:"PHASE 1 — Pre-Market Routine", blurb:"Complete 30–45 min before London open. This phase establishes authority: written bias, no improvisation later.",
+  checks:[
+    ["I have marked PDH, PDL, PWH, PWL, and monthly extremes on the chart","Highest stop-density pools — the intraday magnets"],
+    ["I have marked all unmitigated 4H/Daily swing highs and lows","Untouched swings still hold liquidity"],
+    ["I have marked all open 4H/Daily FVGs","Inefficiencies = probable re-balancing paths"],
+    ["I have written down the DOL (draw on liquidity) with an exact price level","The master variable — vague bias = no trade"],
+    ["I have checked the news calendar and noted all red-folder events with EST times","A kill zone with a red folder inside is a different regime"],
+    ["I have selected 1–2 pairs maximum for today","Pro concentration: scan less, execute better"],
+    ["I have determined my weekly context (Mon range / Tue-Wed expansion / Fri PM caution)","Week profile shapes expectancy"],
+    ["I have written my one-sentence morning thesis (time + price + liquidity)","If you can't write it, you don't have a plan — you have a hope"],
+    ["I am rested, focused, and not trading to recover a previous loss","Emotional state is a position-size multiplier you can't chart"]
+  ],
+  fields:[ {k:"bias",l:"Written HTF Bias (e.g., Bullish — DOL = PDH 1.0890)",type:"text"},
+           {k:"pairsToday",l:"Pairs Selected Today",type:"text"},
+           {k:"newsToday",l:"Red-Folder News Today (event + EST time or 'none')",type:"text"},
+           {k:"thesis",l:"My One-Sentence Morning Thesis",type:"textarea"} ] },
+
+{ id:"structure", nav:"setup", title:"PHASE 2 — Market Structure Read", blurb:"Structure is the grammar. This phase must be complete before any zone is considered.",
+  checks:[
+    ["Daily structure identified (HH/HL uptrend, LL/LH downtrend, or range)","Macro authority — the daily trend outranks everything below"],
+    ["1H structure identified and consistent with my written bias","Intermediate confirmation"],
+    ["The most recent swing protecting the trend is marked (invalidation line)","Where structure dies = where my idea dies"],
+    ["Internal structure distinguished from swing structure","A BOS of an internal high is NOT a BOS of the leg's swing"],
+    ["Current price location vs structure assessed (at premium/discount of structure leg)","Context before pattern"],
+    ["If structure is ambiguous — I acknowledge it and mark 'WAIT'","Ambiguity = liquidity build-up. Wait for the sweep"],
+    ["No unmitigated opposing structure level sits within 2R of my prospective entry","Structural target/stop sanity"]
+  ],
+  fields:[ {k:"structRead",l:"Structure Summary (Daily / 1H / verdict)",type:"textarea"} ] },
+
+{ id:"sd", nav:"setup", title:"PHASE 3 — Supply & Demand Zones", blurb:"S&D done the institutional way: origin-of-displacement zones, not retail support/resistance.",
+  checks:[
+    ["Demand/supply zones identified are the LAST opposing candle(s) before a displacement leg","Origin zones only — mid-trend rectangles are decoration"],
+    ["Each zone's departure move caused a BOS or a liquidity sweep","Cause filter — no BOS/sweep = not a valid zone"],
+    ["Each zone left an FVG on departure (or overlaps one)","Energy filter — imbalance proves institutional delivery"],
+    ["Zones are FRESH (first return) or flagged with touch count","Freshness decays: first tap best, third tap skip"],
+    ["Zones sit in the correct premium/discount half for my direction","Location filter — demand in discount, supply in premium"],
+    ["Zone drawn from candle body (refined) where wick is dominant","Refinement = tighter stop = better RR"],
+    ["Zone aligns with or overlaps a HTF (4H/Daily) zone or FVG","HTF alignment upgrade"]
+  ],
+  fields:[ {k:"sdZones",l:"Key Zones (price ranges + grade A+/A/B)",type:"textarea"} ] },
+
+{ id:"liquidity", nav:"setup", title:"PHASE 4 — Liquidity Map", blurb:"Where are the orders? Which side gets engineered first? This is the manipulation forecast.",
+  checks:[
+    ["All obvious pools marked as ZONES (session H/L, PDH/PDL, EQH/EQL, trendline stops)","Zones, never lines"],
+    ["Stacked pools identified (e.g., equal lows + PDL + round number)","Where pools stack is where manipulation happens"],
+    ["I have identified the likely INDUCEMENT before my intended entry zone","The fake pool before the real one"],
+    ["My intended stop does NOT sit inside the inducement crowd","If your stop is in the crowd, your stop IS the inducement"],
+    ["I know which side was swept LAST (SSL or BSL)","DOL usually sits opposite the most recent sweep"],
+    ["The DOL rotation logic is current (has a major pool been consumed recently?)","Bias lives and dies with the DOL"],
+    ["Opposing pool for my target exists at ≥ my minimum RR","No target = no trade"],
+    ["If trading correlated pairs — SMT divergence checked at the pool","One sweeps, the other refuses = engineered move tell"]
+  ],
+  fields:[ {k:"liqMap",l:"Liquidity Map Summary (stacked pools, inducement, target pool + price)",type:"textarea"} ] },
+
+{ id:"entry", nav:"setup", title:"PHASE 5 — Entry Model Validation", blurb:"The five non-negotiable conditions, in order. Every box must be checked or the trade does not exist.",
+  checks:[
+    ["CONDITION 1 — SWEEP: an obvious pool was wicked through and rejected","The fuel. Wick through, close back inside"],
+    ["CONDITION 2 — DISPLACEMENT: large-bodied candles left the pool, ≥1 clean FVG left behind","3-yes test: energy, function, evidence"],
+    ["CONDITION 3 — CHoCH: body-close beyond the swing protecting the pre-sweep direction","Proof of transfer of control"],
+    ["CONDITION 4 — ZONE: price retraced into the OB/FVG in the correct premium/discount half","The manufactured entry zone"],
+    ["CONDITION 5 — WINDOW: all of the above occurred inside my kill zone","Time is half of the edge"],
+    ["Entry style chosen: confirmation (LTF CHoCH inside zone) or limit at zone/CE — and I stick to it","Pick a style and master it; no mid-trade switching"],
+    ["The setup grades A+ or A on my confluence stack","B-grade setups are watching exercises, not trades"]
+  ],
+  fields:[ {k:"entryType",l:"Entry Style Used",type:"select",opts:["Confirmation (LTF CHoCH in zone)","Limit at OB mean threshold","Limit at FVG CE"]},
+           {k:"setupGrade",l:"Setup Grade",type:"select",opts:["A+ (full stack)","A (valid, minor confluence gap)"]},
+           {k:"seqTimestamps",l:"Sweep / Displacement / CHoCH Timestamps",type:"text"} ] },
+
+{ id:"risk", nav:"execution", title:"PHASE 6 — Risk & Position (calculated BEFORE entry)", blurb:"Math, not vibes. This phase is completed before the order is placed.",
+  checks:[
+    ["No red-folder news inside the next 60 minutes of expected trade life","Front-running news is donating money"],
+    ["Risk per trade ≤ my maximum (default 1%)","Survive the worst streak, not flatter the best week"],
+    ["Stop placed structurally: beyond sweep wick / zone extreme + spread buffer","Never a round number, never a feeling"],
+    ["Invalidation defined: I exit on a BODY CLOSE beyond my invalidation level even if the stop isn't tagged","Close beats level"],
+    ["Position size calculated with the formula and entered exactly","Calculate, don't estimate"],
+    ["Target = the stacked opposing pool, not an arbitrary level","Targets are mathematics"],
+    ["RR verified ≥ my minimum (default 1:2)","Below minimum = skip"],
+    ["My written bias matches the trade direction","No freelancing against my own plan"],
+    ["Today's loss/trade limits still available (max 2 trades/day, -2% daily stop)","Limits are checked BEFORE, not after"]
+  ],
+  fields:[ {k:"pair",l:"Pair",type:"text"},
+           {k:"direction",l:"Direction",type:"select",opts:["Long","Short"]},
+           {k:"entryPrice",l:"Entry Price",type:"text"},
+           {k:"stopPrice",l:"Stop Price",type:"text"},
+           {k:"stopPips",l:"Stop Distance (pips)",type:"number"},
+           {k:"tpPrice",l:"Target Price (pool level)",type:"text"},
+           {k:"rrCalc",l:"Calculated RR (e.g., 1:3.7)",type:"text"},
+           {k:"riskPct",l:"Risk %",type:"number"},
+           {k:"lotSize",l:"Position Size (lots)",type:"text"},
+           {k:"rrMath",l:"Show the math: Lots = (Acct × Risk%) ÷ (Pips × PipValue)",type:"text"} ] },
+
+{ id:"execution", nav:"execution", title:"PHASE 7 — Execution Discipline", blurb:"From order placement to management. Read this phase aloud before clicking buy/sell.",
+  checks:[
+    ["All six previous phases are 100% complete before the order was placed","The gate. Partial plan = no plan"],
+    ["Order placed at my planned level — I did not chase","Chasing = entering premium without a sweep = the retail behaviour I exploit"],
+    ["Hard stop is IN THE PLATFORM (no mental stops)","Mental stops are wishes, not risk management"],
+    ["TP is set in the platform at the pool level","Decisions belong before the trade, not during"],
+    ["I did NOT enter in the 5 minutes before a news release","Absolute rule"],
+    ["After entry I did not move the stop further away, add to a loser, or remove the TP","The market tests conviction, not creativity"],
+    ["At +1R (if triggered): partial taken / breakeven moved ONLY after displacement through structure","BE only when momentum confirms"],
+    ["At +2R (if triggered): stop trailed behind the most recent LTF swing","Protect the runner"],
+    ["If invalidation-by-close occurred, I exited on that close — no hoping","Close beats level, always"],
+    ["If the trade was a re-sweep stop-out: I accepted it and did NOT re-enter emotionally","Re-sweeps are normal; revenge is fatal"]
+  ],
+  fields:[ {k:"outcome",l:"Trade Outcome",type:"select",opts:["Pending / In Progress","Win (target hit)","Win (trailed exit)","Loss (stop hit)","Breakeven","Scratched / manual exit"]},
+           {k:"pnlR",l:"Result in R (e.g., +3.2 or -1)",type:"text"},
+           {k:"pnlPct",l:"Result in % of account",type:"text"},
+           {k:"exitNotes",l:"Exit Notes (what happened, what I did)",type:"textarea"} ] },
+
+{ id:"review", nav:"review", title:"PHASE 8 — Post-Trade Review (mandatory, every trade)", blurb:"The journal IS the edge. An unreviewed trade is a lost lesson.",
+  checks:[
+    ["Before/after screenshots saved to my journal folder","Data or it didn't happen"],
+    ["Loss tagged: model-fail OR execution-fail (wins also reviewed for violations)","The tag separates model problems from behaviour problems"],
+    ["Every checklist violation (if any) named specifically — not 'I felt off'","Specific beats vague; vague cannot be fixed"],
+    ["If the trade was a missed opportunity instead: hesitation cause logged, NO chase executed","Chasing is trading in premium without a sweep"],
+    ["Lesson written in one sentence for the trade log","One lesson per trade, compounding daily"]
+  ],
+  fields:[ {k:"lossTag",l:"Loss Tag (losses only)",type:"select",opts:["N/A — not a loss","model-fail (sequence valid, price went against)","execution-fail (checklist violated)"]},
+           {k:"violation",l:"Specific Rule Violations (or 'none')",type:"text"},
+           {k:"lesson",l:"One-Sentence Lesson",type:"textarea"} ] }
+];
+
+/* ================== HELPERS ================== */
+function sectState(id){ if(!state[id]) state[id] = { checks:{}, fields:{} }; return state[id]; }
+function sectComplete(sec){
+  const st = sectState(sec.id);
+  const total = sec.checks.length;
+  const done = sec.checks.filter((c,i)=>st.checks[i]).length;
+  let fieldsOk = true;
+  (sec.fields||[]).forEach(f=>{ if(!st.fields[f.k] || !String(st.fields[f.k]).trim()) fieldsOk=false; });
+  return { done, total, fieldsOk, complete: done===total && fieldsOk };
+}
+function overallStatus(){
+  let total=0, done=0, allFields=true;
+  SECTIONS.forEach(s=>{ const c=sectComplete(s); total+=c.total; done+=c.done; if(!c.fieldsOk) allFields=false; });
+  const pct = Math.round(done/total*100);
+  const go = done===total && allFields;
+  return { pct, go, allFields, done, total };
+}
+function dayState(){
+  const d = S.get("day");
+  const rules = S.get("rules");
+  return { ...d,
+    tradesLeft: rules.maxTradesPerDay - d.trades,
+    lossLimitHit: d.pnlPct <= -rules.dailyLossPct,
+    maxLossesHit: d.losses >= 2 };
+}
+
+/* ================== RENDER ================== */
+const app = document.getElementById("app");
+function render(){
+  const page = S.get("page") || "dashboard";
+  document.querySelectorAll("[data-nav]").forEach(a=>a.classList.toggle("active",a.dataset.nav===page));
+  if(page==="dashboard") renderDash();
+  else if(page==="rules") renderRules();
+  else if(page==="premarket") renderPhase("premarket");
+  else if(page==="setup"){ renderPhase("structure"); renderPhase("sd"); renderPhase("liquidity"); renderPhase("entry"); }
+  else if(page==="execution"){ renderPhase("risk"); renderPhase("execution"); }
+  else if(page==="review") renderPhase("review");
+  bindEvents();
+}
+function goBtn(page,label){ return `<button class="btn blue" data-go="${page}">${label}</button>`; }
+
+function renderDash(){
+  const o = overallStatus(), d = dayState(), rules = S.get("rules");
+  const status = d.lossLimitHit||d.maxLossesHit ? {cls:"nogo",txt:"NO TRADING TODAY — DAILY LIMIT REACHED"} :
+    o.go ? {cls:"go",txt:"GREEN LIGHT — PLAN COMPLETE, EXECUTION AUTHORIZED"} :
+    o.pct>=50 ? {cls:"partial",txt:`IN PROGRESS — ${o.pct}% of plan complete`} :
+    {cls:"nogo",txt:`NOT READY — ${o.pct}% of plan complete`};
+  const sectRows = SECTIONS.map(s=>{ const c=sectComplete(s);
+    return `<tr><td>${s.title}</td><td>${c.done}/${c.total}</td><td>${c.fieldsOk?"<span class='pos'>OK</span>":"<span class='neg'>fields missing</span>"}</td><td>${c.complete?"<span class='pos'>✓</span>":"<span class='neg'>—</span>"}</td><td>${goBtn(s.nav==="premarket"?"premarket":s.nav,"Open")}</td></tr>`; }).join("");
+  app.innerHTML = `
+  <h1>GILBERT's Trade Plan Execution System</h1>
+  <p class="sub">A professional SMC trader doesn't decide in the moment — he executes a plan written before the session. This system enforces it.</p>
+  <div class="hero-bar">
+    <div class="status ${status.cls}">${status.txt}</div>
+    <div>
+      <button class="btn gray" id="newday">New Trading Day (reset)</button>
+      <button class="btn gray" id="export">Export Data</button>
+      <button class="btn gray" id="importBtn">Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none">
+    </div>
+  </div>
+  <div class="grid stats">
+    <div class="stat"><div class="v">${o.pct}%</div><div class="l">Plan Complete</div></div>
+    <div class="stat"><div class="v">${d.trades}</div><div class="l">Trades Today (max ${rules.maxTradesPerDay})</div></div>
+    <div class="stat"><div class="v ${d.pnlPct<0?'neg':'pos'}">${d.pnlPct}%</div><div class="l">Today P&L (stop -${rules.dailyLossPct}%)</div></div>
+    <div class="stat"><div class="v">${Math.max(0,d.tradesLeft)}</div><div class="l">Trades Left Today</div></div>
+  </div>
+  ${(d.lossLimitHit||d.maxLossesHit)?`<div class="danger-box"><h2>⛔ TRADING PROHIBITED — DAILY LIMIT HIT</h2><p>${d.maxLossesHit?"Two consecutive losses logged. ":""}${d.lossLimitHit?"Daily loss limit breached. ":""}Platform is closed, journal is written, tomorrow is a new account. This rule exists because <b>${rules.dailyLossPct}% discipline is what makes the 90-day plan survive.</b></p></div>`:""}
+  ${!o.go?`<div class="warn"><b>Execution gate:</b> no live trade is authorized until every checklist item and field in Phases 1–5 is complete. A partial plan is a story you're telling yourself.</div>`:""}
+  <h2>Phase Progress</h2>
+  <table><tr><th>Phase</th><th>Checklist</th><th>Fields</th><th>Done</th><th></th></tr>${sectRows}</table>
+  <h2>My Non-Negotiable Rules</h2>
+  ${S.get("rules").personal.map(r=>`<div class="rule">⚡ ${r}</div>`).join("")}
+  <div style="margin-top:1rem">${goBtn("premarket","Start Phase 1 → Pre-Market")}</div>`;
+}
+
+function renderPhase(id){
+  const sec = SECTIONS.find(s=>s.id===id); if(!sec) return;
+  const st = sectState(id); const c = sectComplete(sec);
+  app.innerHTML = `
+  <h1>${sec.title}</h1><p class="sub">${sec.blurb}</p>
+  <div class="sect ${c.complete?'complete':'incomplete'}">
+    <div class="sect-head"><h2>Checklist — ${c.done}/${c.total}</h2><span class="sect-meta">${c.complete?"COMPLETE":"INCOMPLETE"}</span></div>
+    <ul class="cl">
+    ${sec.checks.map((chk,i)=>`
+      <li data-sect="${id}" data-i="${i}" class="${st.checks[i]?'checked':''}">
+        <span class="box">✓</span><span class="txt">${chk[0]}<span class="why">↳ ${chk[1]}</span></span>
+      </li>`).join("")}
+    </ul>
+  </div>
+  <div class="sect">
+    <div class="sect-head"><h2>Required Fields</h2><span class="sect-meta">${c.fieldsOk?"COMPLETE":"INCOMPLETE — all fields required"}</span></div>
+    ${(sec.fields||[]).map(f=>`
+      <div class="field"><label>${f.l}</label>
+      ${f.type==="textarea"?`<textarea data-field="${id}" data-k="${f.k}">${st.fields[f.k]||""}</textarea>`
+       :f.type==="select"?`<select data-field="${id}" data-k="${f.k}"><option value="">— select —</option>${f.opts.map(o=>`<option ${st.fields[f.k]===o?"selected":""}>${o}</option>`).join("")}</select>`
+       :`<input type="${f.type}" data-field="${id}" data-k="${f.k}" value="${st.fields[f.k]||""}">`}
+      </div>`).join("")}
+  </div>
+  <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+    ${goBtn("dashboard","← Dashboard")}${nextPhaseBtn(id)}
+  </div>`;
+}
+function nextPhaseBtn(id){
+  const order=["premarket","structure","sd","liquidity","entry","risk","execution","review"];
+  const i=order.indexOf(id);
+  if(i===order.length-1) return goBtn("dashboard","Finish — Dashboard ✓");
+  const nxt=SECTIONS.find(s=>s.id===order[i+1]);
+  return goBtn(nxt.nav,`Next → ${nxt.title.split("—")[1].trim()}`);
+}
+function renderRules(){
+  const r = S.get("rules");
+  app.innerHTML = `
+  <h1>My Trading Rules</h1><p class="sub">These are the constitution. Editing them mid-session is forbidden — review and update only on weekends.</p>
+  <div class="sect">
+    <h2>Hard Limits</h2>
+    <div class="frow">
+      <div class="field"><label>Max Risk % per Trade</label><input id="r-maxRiskPct" type="number" step="0.1" value="${r.maxRiskPct}"></div>
+      <div class="field"><label>Daily Loss Stop %</label><input id="r-dailyLossPct" type="number" step="0.5" value="${r.dailyLossPct}"></div>
+      <div class="field"><label>Minimum RR</label><input id="r-minRR" type="number" step="0.5" value="${r.minRR}"></div>
+      <div class="field"><label>Max Trades per Day</label><input id="r-maxTradesPerDay" type="number" value="${r.maxTradesPerDay}"></div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>My Pairs</label><input id="r-pairs" value="${r.pairs}"></div>
+      <div class="field"><label>My Kill Zones</label><input id="r-killzones" value="${r.killzones}"></div>
+    </div>
+    <h2>Personal Commandments</h2>
+    <div class="field"><textarea id="r-personal" style="min-height:180px">${r.personal.join("\n")}</textarea></div>
+    <p class="sub">One rule per line.</p>
+    <button class="btn" id="saveRules">Save Rules</button>
+  </div>
+  <div class="warn"><b>Position sizing formula:</b> Lots = (Account × Risk%) ÷ (Stop pips × Pip value per lot). Example: $10,000 × 1% ÷ (14 pips × $10) = 0.71 lots. Calculated before entry, every entry.</div>
+  ${goBtn("dashboard","← Dashboard")}`;
+}
+
+/* ================== EVENTS ================== */
+function bindEvents(){
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{ S.set("page",b.dataset.go); render(); window.scrollTo(0,0); });
+  document.querySelectorAll("[data-nav]").forEach(a=>a.onclick=()=>{ S.set("page",a.dataset.nav); render(); window.scrollTo(0,0); });
+  document.querySelectorAll(".cl li").forEach(li=>{
+    li.onclick = ()=>{ const st=sectState(li.dataset.sect); const i=+li.dataset.i;
+      st.checks[i]=!st.checks[i]; save(); render(); };
+  });
+  document.querySelectorAll("[data-field]").forEach(el=>{
+    el.oninput = ()=>{ const st=sectState(el.dataset.field); st.fields[el.dataset.k]=el.value; save(); updateStatusOnly(); };
+  });
+  const nd=document.getElementById("newday");
+  if(nd) nd.onclick=()=>{ if(confirm("Start a new trading day? This resets today's counters and the full checklist (history is kept in exports).")){
+    S.set("day",{date:new Date().toISOString().slice(0,10),trades:0,losses:0,pnlPct:0});
+    state={}; save(); render(); toast("New day — fresh checklist. Plan first, execute second."); } };
+  const ex=document.getElementById("export");
+  if(ex) ex.onclick=()=>{
+    const blob=new Blob([JSON.stringify({day:S.get("day"),state,rules:S.get("rules"),exported:new Date().toISOString()},null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="gilbert-tradeplan-"+new Date().toISOString().slice(0,10)+".json"; a.click(); toast("Exported."); };
+  const ib=document.getElementById("importBtn");
+  if(ib) ib.onclick=()=>document.getElementById("importFile").click();
+  const inf=document.getElementById("importFile");
+  if(inf) inf.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const rd=new FileReader();
+    rd.onload=()=>{ try{ const j=JSON.parse(rd.result); if(j.day)S.set("day",j.day); if(j.state){state=j.state;save();} if(j.rules)S.set("rules",j.rules); render(); toast("Imported."); }catch(err){alert("Invalid file.");} }; rd.readAsText(f); };
+  const sr=document.getElementById("saveRules");
+  if(sr) sr.onclick=()=>{
+    S.set("rules",{ maxRiskPct:+document.getElementById("r-maxRiskPct").value,
+      dailyLossPct:+document.getElementById("r-dailyLossPct").value,
+      minRR:+document.getElementById("r-minRR").value,
+      maxTradesPerDay:+document.getElementById("r-maxTradesPerDay").value,
+      pairs:document.getElementById("r-pairs").value,
+      killzones:document.getElementById("r-killzones").value,
+      personal:document.getElementById("r-personal").value.split("\n").filter(x=>x.trim()) });
+    toast("Rules saved. Constitution updated."); render(); };
+}
+function updateStatusOnly(){ const o=overallStatus(); const el=document.querySelector(".status");
+  if(el&&o.go){ el.className="status go"; el.textContent="GREEN LIGHT — PLAN COMPLETE, EXECUTION AUTHORIZED"; toast("All checks complete — execution authorized."); } }
+render();
+</script>
+</body>
+</html>
